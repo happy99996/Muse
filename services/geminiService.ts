@@ -4,9 +4,37 @@ import { GoogleGenAI, Modality } from "@google/genai";
 const MODEL_CREATIVE = 'gemini-3-pro-preview';
 const MODEL_TTS = 'gemini-2.5-flash-preview-tts';
 
-// Lazy initialization to prevent top-level crashes if process.env is not immediately ready in some bundlers
+// Helper to safely get the API key in various environments (Vite/Node)
+const getApiKey = (): string => {
+  try {
+    // Check process.env (Node/Webpack/Defined in Vite config)
+    if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+      return process.env.API_KEY;
+    }
+  } catch (e) {
+    // Ignore ReferenceError if process is not defined
+  }
+
+  try {
+    // Check import.meta.env (Standard Vite)
+    // @ts-ignore
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_KEY) {
+      // @ts-ignore
+      return import.meta.env.VITE_API_KEY;
+    }
+  } catch (e) {
+    // Ignore
+  }
+  
+  return '';
+};
+
 const getAiClient = () => {
-  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    console.error("Gemini API Key is missing. Please set API_KEY or VITE_API_KEY in your environment variables.");
+  }
+  return new GoogleGenAI({ apiKey });
 };
 
 export const generateStoryFromImage = async (base64Image: string, mimeType: string, promptText?: string) => {
