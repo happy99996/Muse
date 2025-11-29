@@ -4,7 +4,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   define: {
-    // Polyfill process.env to prevent crashes in third-party libs
+    // Defines process.env as an empty object in the browser to prevent crashes
+    // if code tries to access it directly without checking for existence.
+    // The actual API key is accessed via import.meta.env in geminiService.ts
     'process.env': {}
   },
   build: {
