@@ -29,7 +29,7 @@
         background: #a8a8a8;
       }
     </style>
-<script type="importmap">
+  <script type="importmap">
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
@@ -46,7 +46,7 @@
   <body class="bg-slate-50 text-slate-900 antialiased h-screen overflow-hidden">
     <div id="root" class="h-full"></div>
     <script>
-      // Polyfill process for browser environment to prevent ReferenceError
+      // Polyfill process for browser environment to prevent ReferenceError if simple process.env access is used
       window.process = window.process || { env: {} };
     </script>
     <script type="module" src="./index.tsx"></script>
