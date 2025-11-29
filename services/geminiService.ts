@@ -1,13 +1,17 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 // Models
 const MODEL_CREATIVE = 'gemini-3-pro-preview';
 const MODEL_TTS = 'gemini-2.5-flash-preview-tts';
 
+// Lazy initialization to prevent top-level crashes if process.env is not immediately ready in some bundlers
+const getAiClient = () => {
+  return new GoogleGenAI({ apiKey: process.env.API_KEY });
+};
+
 export const generateStoryFromImage = async (base64Image: string, mimeType: string, promptText?: string) => {
   try {
+    const ai = getAiClient();
     const prompt = promptText || "Analyze the mood, lighting, and scene details of this image. Then, acting as a creative author, ghostwrite an engaging opening paragraph to a story set in this world. Keep it evocative and under 200 words.";
     
     const response = await ai.models.generateContent({
@@ -39,6 +43,7 @@ export const generateStoryFromImage = async (base64Image: string, mimeType: stri
 
 export const generateSpeech = async (text: string): Promise<string> => {
   try {
+    const ai = getAiClient();
     const response = await ai.models.generateContent({
       model: MODEL_TTS,
       contents: {
@@ -73,6 +78,7 @@ export const streamChatMessage = async function* (
   newImage?: { data: string; mimeType: string }
 ) {
   try {
+    const ai = getAiClient();
     // We recreate the chat session for each turn to include images properly if they are part of history
     // Since simple chat history array in SDK doesn't always support inline images easily in `history` prop for all models,
     // we will construct the `contents` manually.
