@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Muse: AI Creative Writer</title>
+    <!-- Using Tailwind CDN for quick styling without build step config -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -45,10 +46,6 @@
 </head>
   <body class="bg-slate-50 text-slate-900 antialiased h-screen overflow-hidden">
     <div id="root" class="h-full"></div>
-    <script>
-      // Polyfill process for browser environment to prevent ReferenceError if simple process.env access is used
-      window.process = window.process || { env: {} };
-    </script>
     <script type="module" src="./index.tsx"></script>
   </body>
 </html>
