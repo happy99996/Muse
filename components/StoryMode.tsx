@@ -14,6 +14,7 @@ const StoryMode: React.FC = () => {
     error: null,
   });
 
+  const [promptInput, setPromptInput] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -40,16 +41,7 @@ const StoryMode: React.FC = () => {
 
     setState(prev => ({ ...prev, isGeneratingStory: true, error: null, generatedStory: null, audioBlobUrl: null }));
     try {
-      // Assuming PNG for simplicity if mime type detection is complex, but base64 usually has it.
-      // However, our fileToBase64 returns raw base64. Let's assume JPEG/PNG.
-      // Ideally we pass the file type.
-      // The API supports auto-detection usually or we can check the header. 
-      // For this demo, let's assume image/jpeg if specific type isn't passed, 
-      // but actually we should grab it from the file object.
-      // Re-implementing upload to capture mime type would be better, but let's just default 'image/jpeg' 
-      // as it's robust enough for most common photos, or use a heuristic.
-      
-      const story = await generateStoryFromImage(state.image, 'image/jpeg');
+      const story = await generateStoryFromImage(state.image, 'image/jpeg', promptInput.trim() || undefined);
       setState(prev => ({ ...prev, generatedStory: story, isGeneratingStory: false }));
     } catch (err) {
       setState(prev => ({ ...prev, isGeneratingStory: false, error: "Failed to generate story. Please try again." }));
@@ -83,14 +75,18 @@ const StoryMode: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col md:flex-row overflow-hidden bg-white shadow-xl rounded-2xl border border-slate-100">
+    <div className="h-full flex flex-col md:flex-row overflow-hidden bg-white dark:bg-slate-800 shadow-xl rounded-2xl border border-slate-100 dark:border-slate-700 transition-colors duration-200">
       {/* Left Panel: Image & Controls */}
-      <div className="md:w-1/2 bg-slate-50 p-6 flex flex-col border-b md:border-b-0 md:border-r border-slate-200 overflow-y-auto">
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Visual Prompt</h2>
-        <p className="text-slate-500 mb-6 text-sm">Upload an image to inspire the AI storyteller.</p>
+      <div className="md:w-1/2 bg-slate-50 dark:bg-slate-900/50 p-6 flex flex-col border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700 overflow-y-auto">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-2">Visual Prompt</h2>
+        <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm">Upload an image to inspire the AI storyteller.</p>
 
         <div 
-          className={`flex-grow border-2 border-dashed rounded-xl flex items-center justify-center relative min-h-[300px] transition-colors ${state.image ? 'border-slate-300 bg-black' : 'border-indigo-200 bg-indigo-50 hover:bg-indigo-100 cursor-pointer'}`}
+          className={`flex-grow border-2 border-dashed rounded-xl flex items-center justify-center relative min-h-[300px] transition-colors ${
+            state.image 
+              ? 'border-slate-300 dark:border-slate-600 bg-black' 
+              : 'border-indigo-200 dark:border-slate-700 bg-indigo-50 dark:bg-slate-800/50 hover:bg-indigo-100 dark:hover:bg-slate-800 cursor-pointer'
+          }`}
           onClick={() => !state.image && fileInputRef.current?.click()}
         >
             {state.image ? (
@@ -111,9 +107,9 @@ const StoryMode: React.FC = () => {
               </>
             ) : (
               <div className="text-center p-6">
-                <ArrowUpTrayIcon className="w-12 h-12 text-indigo-400 mx-auto mb-2" />
-                <p className="text-indigo-600 font-medium">Click to upload photo</p>
-                <p className="text-indigo-400 text-xs mt-1">Supports JPG, PNG</p>
+                <ArrowUpTrayIcon className="w-12 h-12 text-indigo-400 dark:text-slate-500 mx-auto mb-2" />
+                <p className="text-indigo-600 dark:text-slate-300 font-medium">Click to upload photo</p>
+                <p className="text-indigo-400 dark:text-slate-500 text-xs mt-1">Supports JPG, PNG</p>
               </div>
             )}
             <input 
@@ -125,14 +121,27 @@ const StoryMode: React.FC = () => {
             />
         </div>
 
-        <div className="mt-6">
+        <div className="mt-6 space-y-4">
+           <div>
+             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+               Story Instructions (Optional)
+             </label>
+             <textarea 
+               value={promptInput}
+               onChange={(e) => setPromptInput(e.target.value)}
+               placeholder="E.g., Write a scary ghost story about this place..."
+               className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+               rows={2}
+             />
+           </div>
+
            <button
             onClick={handleGenerateStory}
             disabled={!state.image || state.isGeneratingStory}
             className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 font-semibold text-white transition-all shadow-lg ${
               !state.image || state.isGeneratingStory
-                ? 'bg-slate-300 cursor-not-allowed shadow-none'
-                : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-indigo-200'
+                ? 'bg-slate-300 dark:bg-slate-700 cursor-not-allowed shadow-none text-slate-500 dark:text-slate-500'
+                : 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-indigo-200 dark:hover:shadow-none'
             }`}
           >
             {state.isGeneratingStory ? (
@@ -154,24 +163,24 @@ const StoryMode: React.FC = () => {
       </div>
 
       {/* Right Panel: Story & Audio */}
-      <div className="md:w-1/2 p-8 flex flex-col relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')]">
-        <h2 className="text-2xl font-bold text-slate-800 mb-4 font-serif">The Story</h2>
+      <div className="md:w-1/2 p-8 flex flex-col relative overflow-hidden bg-[url('https://www.transparenttextures.com/patterns/cream-paper.png')] dark:bg-none dark:bg-slate-900 transition-colors duration-200">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 mb-4 font-serif">The Story</h2>
         
         {state.generatedStory ? (
           <div className="flex-grow overflow-y-auto mb-20 pr-2">
-            <p className="text-lg leading-loose text-slate-800 serif whitespace-pre-line animate-fade-in">
+            <p className="text-lg leading-loose text-slate-800 dark:text-slate-300 serif whitespace-pre-line animate-fade-in">
               {state.generatedStory}
             </p>
           </div>
         ) : (
-          <div className="flex-grow flex items-center justify-center text-slate-400 italic serif text-center px-8">
+          <div className="flex-grow flex items-center justify-center text-slate-400 dark:text-slate-500 italic serif text-center px-8">
             "Every picture tells a story. Upload one to hear it."
           </div>
         )}
 
         {/* Audio Player Sticky Footer */}
         {state.generatedStory && (
-          <div className="absolute bottom-0 left-0 right-0 p-6 bg-white/90 backdrop-blur-md border-t border-slate-200 flex items-center justify-between transition-transform">
+          <div className="absolute bottom-0 left-0 right-0 p-6 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 flex items-center justify-between transition-transform">
             {state.audioBlobUrl ? (
               <div className="w-full flex items-center gap-4">
                 <audio ref={audioRef} controls src={state.audioBlobUrl} className="w-full h-10 accent-indigo-600" />
@@ -182,8 +191,8 @@ const StoryMode: React.FC = () => {
                 disabled={state.isGeneratingAudio}
                 className={`w-full py-3 rounded-lg flex items-center justify-center gap-2 font-medium border transition-colors ${
                   state.isGeneratingAudio 
-                    ? 'bg-indigo-50 border-indigo-100 text-indigo-400' 
-                    : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-indigo-600'
+                    ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-100 dark:border-indigo-900 text-indigo-400' 
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400'
                 }`}
               >
                 {state.isGeneratingAudio ? (
@@ -206,9 +215,9 @@ const StoryMode: React.FC = () => {
         )}
         
         {state.error && (
-            <div className="absolute top-4 left-4 right-4 bg-red-100 text-red-700 p-3 rounded-lg text-sm flex justify-between items-center shadow-md">
+            <div className="absolute top-4 left-4 right-4 bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-200 p-3 rounded-lg text-sm flex justify-between items-center shadow-md">
                 <span>{state.error}</span>
-                <button onClick={() => setState(s => ({...s, error: null}))} className="text-red-800 hover:text-red-900 font-bold">&times;</button>
+                <button onClick={() => setState(s => ({...s, error: null}))} className="text-red-800 dark:text-red-100 hover:text-red-900 font-bold">&times;</button>
             </div>
         )}
       </div>

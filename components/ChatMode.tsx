@@ -117,10 +117,10 @@ const ChatMode: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+    <div className="h-full flex flex-col bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 overflow-hidden transition-colors duration-200">
       {/* Header */}
-      <div className="p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-        <h2 className="font-semibold text-slate-800">Muse Chat</h2>
+      <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-between">
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Muse Chat</h2>
         <button 
             onClick={handleClearChat} 
             className="text-xs text-slate-400 hover:text-red-500 flex items-center gap-1 transition-colors"
@@ -131,11 +131,11 @@ const ChatMode: React.FC = () => {
       </div>
 
       {/* Message List */}
-      <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-white">
+      <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-white dark:bg-slate-800">
         {messages.length === 0 && (
-          <div className="h-full flex flex-col items-center justify-center text-slate-400 opacity-60">
-             <div className="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mb-4">
-                <PaperAirplaneIcon className="w-8 h-8 text-indigo-300" />
+          <div className="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 opacity-60">
+             <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mb-4">
+                <PaperAirplaneIcon className="w-8 h-8 text-indigo-300 dark:text-indigo-400" />
              </div>
              <p>Start a conversation...</p>
           </div>
@@ -147,7 +147,7 @@ const ChatMode: React.FC = () => {
               className={`max-w-[80%] rounded-2xl p-4 shadow-sm ${
                 msg.role === 'user' 
                   ? 'bg-indigo-600 text-white rounded-br-none' 
-                  : 'bg-slate-100 text-slate-800 rounded-bl-none'
+                  : 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-100 rounded-bl-none'
               }`}
             >
               {msg.image && (
@@ -168,17 +168,17 @@ const ChatMode: React.FC = () => {
       </div>
 
       {/* Input Area */}
-      <div className="p-4 border-t border-slate-100 bg-white">
+      <div className="p-4 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800">
         {selectedImage && (
-            <div className="flex items-center gap-2 mb-2 p-2 bg-slate-50 rounded-lg border border-slate-200 inline-flex">
-                <span className="text-xs text-slate-500">Image attached</span>
-                <button onClick={() => setSelectedImage(null)} className="text-slate-400 hover:text-slate-600">&times;</button>
+            <div className="flex items-center gap-2 mb-2 p-2 bg-slate-50 dark:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-600 inline-flex">
+                <span className="text-xs text-slate-500 dark:text-slate-300">Image attached</span>
+                <button onClick={() => setSelectedImage(null)} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">&times;</button>
             </div>
         )}
-        <div className="flex items-end gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 focus-within:border-indigo-300 focus-within:ring-2 focus-within:ring-indigo-100 transition-all">
+        <div className="flex items-end gap-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-700 focus-within:border-indigo-300 dark:focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-100 dark:focus-within:ring-indigo-900/50 transition-all">
           <button 
             onClick={() => fileInputRef.current?.click()}
-            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+            className="p-2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors"
             title="Upload Image"
           >
             <PhotoIcon className="w-6 h-6" />
@@ -201,7 +201,7 @@ const ChatMode: React.FC = () => {
               }
             }}
             placeholder="Type your message..."
-            className="flex-grow bg-transparent border-none focus:ring-0 text-slate-800 placeholder-slate-400 resize-none py-2 max-h-32 min-h-[44px]"
+            className="flex-grow bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 resize-none py-2 max-h-32 min-h-[44px]"
             rows={1}
           />
           
@@ -210,7 +210,7 @@ const ChatMode: React.FC = () => {
             disabled={(!input.trim() && !selectedImage) || isLoading}
             className={`p-2 rounded-lg transition-all ${
               (!input.trim() && !selectedImage) || isLoading
-                ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                ? 'bg-slate-200 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
                 : 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md'
             }`}
           >
